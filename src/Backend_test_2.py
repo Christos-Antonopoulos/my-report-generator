@@ -111,7 +111,7 @@ def generate_detailed_report_from_structure(structure, student_name, gender, cla
             {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the notes of what to write"},
             {"role": "user", "content": prompt}
         ],
-        max_tokens= 1000
+        max_tokens= 600
     )
     
     # Access the response correctly
@@ -145,6 +145,32 @@ def generate_report():
         return jsonify({"report": report})
     
 
+@app.route('/generate_detailed_report', methods=['POST'])
+@cross_origin()  # Make sure to allow CORS for this endpoint
+def generate_detailed_report_endpoint():
+    # Ensure you're getting JSON data
+    if request.is_json:
+        data = request.get_json()
+        structure = data.get('structure')
+        student_name = data.get('student_name')
+        gender = data.get('gender')
+        class_behavior = data.get('class_behavior')
+        strengths = data.get('strengths')
+        year_group = data.get('year_group')
+        subject = data.get('subject')
+        academic_performance = data.get('academic_performance')
+        areas_of_development = data.get('areas_of_development')
+        tone = data.get('tone')
+        report_length = data.get('report_length', 200)  # Default to 1000 if not provided
+        
+        # Call the function to generate the detailed report
+        detailed_report = generate_detailed_report_from_structure(structure, student_name, gender, class_behavior, strengths, year_group, subject, academic_performance, areas_of_development, tone, report_length)
+
+        # Return the detailed report
+        return jsonify({"detailedReport": detailed_report})
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+    
 
     
 @app.route('/')

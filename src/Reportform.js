@@ -21,11 +21,32 @@ const ReportForm = () => {
 
     // State for the generated report
     const [report, setReport] = useState('');
+    const [detailedReport, setDetailedReport] = useState(''); // New state for the detailed report
+    // const handleReportChange = (content) => {
+    //     setReport(content);
+    // };
+    // const handleDetailedReportChange = (content) => {
+    //     setDetailedReport(content);
+
 
     // Update form state based on input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormValues({ ...formValues, [name]: value });
+    };
+
+    // New function to handle detailed report generation
+    const handleDetailedReportGeneration = async () => {
+        try {
+            const detailedResponse = await axios.post('http://127.0.0.1:5000/generate_detailed_report', {
+                structure: report, // The structure obtained from the first API call
+                // Include other formValues that are needed to generate the detailed report
+                ...formValues
+            });
+            setDetailedReport(detailedResponse.data.detailedReport);
+        } catch (error) {
+            console.error('Error generating the detailed report:', error);
+        }
     };
 
     // Handle form submission
@@ -38,7 +59,10 @@ const ReportForm = () => {
         } catch (error) {
             console.error('Error generating the report:', error);
         }
+        await handleDetailedReportGeneration();
     };
+
+    
 
     return (
         <div>
@@ -115,7 +139,8 @@ const ReportForm = () => {
                 />
                 <button type="submit">Generate Report</button>
             </form>
-            <ReactQuill theme="snow" value={report} readOnly />
+            <ReactQuill theme="snow" value={report}  />
+            <ReactQuill theme="snow" value={detailedReport}  />
         </div>
     );
 };
