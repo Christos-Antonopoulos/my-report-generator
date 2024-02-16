@@ -1,0 +1,31 @@
+/* ReportForm.css */
+
+
+
+
+.input-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+/* Individual input fields */
+.input-field {
+  flex: 1; /* Each field will take up equal space */
+  margin: 10px; /* Adjust the margin as needed */
+  padding: 5px; /* Adjust the padding as needed */
+  min-width: 150px; /* Minimum width of each field */
+}
+
+/* Container for editors */
+.editors-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Individual editors */
+.editor {
+  width: 500px; /* Set a fixed width */
+  height: 300px; /* Set a fixed height */
+}

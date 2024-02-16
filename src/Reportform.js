@@ -22,12 +22,21 @@ const ReportForm = () => {
     // State for the generated report
     const [report, setReport] = useState('');
     const [detailedReport, setDetailedReport] = useState(''); // New state for the detailed report
+    const [lastSavedStructure, setLastSavedStructure] = useState('');
+    const [lastSavedReport, setLastSavedReport] = useState('');
     // const handleReportChange = (content) => {
     //     setReport(content);
     // };
     // const handleDetailedReportChange = (content) => {
     //     setDetailedReport(content);
-
+    const handleStructureChange = (content) => {
+        setReport(content); // Update the current structure state
+    };
+      
+      // Handler for changes in the full report text editor (Editor 2)
+    const handleReportChange = (content) => {
+        setDetailedReport(content); // Update the current report state
+    };
 
     // Update form state based on input changes
     const handleChange = (e) => {
@@ -49,6 +58,29 @@ const ReportForm = () => {
         }
     };
 
+    const handleRegenerateReport = async () => {
+        try {
+            const dataToSend = {
+                last_saved_structure: lastSavedStructure,
+                last_saved_report: lastSavedReport,
+                current_structure: report,
+                current_report: detailedReport,
+            };
+            const response = await axios.post('http://127.0.0.1:5000/regenerate_detailed_report', {
+                last_saved_structure: lastSavedStructure,
+                last_saved_report: lastSavedReport,
+                current_structure: report, // The current content of the first editor
+                current_report: detailedReport, // The current content of the second editor
+            });
+
+            // Update the content of the text editors with the regenerated report
+            //setReport(response.data.updatedDetailedReport); // tjat was a mistake 
+            setDetailedReport(response.data.updatedDetailedReport);
+        } catch (error) {
+            console.error('Error regenerating the report:', error);
+        }
+    };
+
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent default form submission behavior
@@ -61,6 +93,7 @@ const ReportForm = () => {
         }
         await handleDetailedReportGeneration();
     };
+    
 
     
 
@@ -136,13 +169,29 @@ const ReportForm = () => {
                     placeholder="Report Length (words)"
                     value={formValues.report_length}
                     onChange={handleChange}
+
                 />
                 <button type="submit">Generate Report</button>
             </form>
-            <ReactQuill theme="snow" value={report}  />
-            <ReactQuill theme="snow" value={detailedReport}  />
+            <div className="editors-container">
+                <div className="editor">
+                    <ReactQuill theme="snow" value={report} onChange={(content) => setReport(content) } />
+
+                </div>
+                <div className="editor">
+                <ReactQuill theme="snow" value={detailedReport} onChange={(content) => setDetailedReport(content)}  />
+
+                </div>
+                </div>
+                <button onClick={handleRegenerateReport}>Regenerate Full Report</button>
+
+            
+            
+            
+            
+            
         </div>
-    );
+    );    
 };
 
 export default ReportForm;

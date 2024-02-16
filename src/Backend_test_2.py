@@ -43,12 +43,12 @@ def generate_student_report_structure(student_name, gender, class_behavior, stre
 
     # Call the OpenAI API
     chat_completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=report_length
+        max_tokens= 500
     )
     
     # Access the response correctly
@@ -106,12 +106,12 @@ def generate_detailed_report_from_structure(structure, student_name, gender, cla
 
     # Call the OpenAI API
     chat_completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the notes of what to write"},
             {"role": "user", "content": prompt}
         ],
-        max_tokens= 600
+        max_tokens= 2000
     )
     
     # Access the response correctly
@@ -172,6 +172,47 @@ def generate_detailed_report_endpoint():
         return jsonify({"error": "Request must be JSON"}), 400
     
 
+@app.route('/regenerate_detailed_report', methods=['POST'])
+@cross_origin()
+def regenerate_detailed_report():
+    if request.is_json:
+        # Extract the necessary data from the request
+        data = request.get_json()
+        last_saved_structure = data.get('last_saved_structure')
+        last_saved_report = data.get('last_saved_report')
+        current_structure = data.get('current_structure')
+        current_report = data.get('current_report')
+
+        # Reuse the OpenAI client setup
+        client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+
+        # Create the prompt for the OpenAI API call
+        prompt = (
+            f"Here is the previous report outline and the corresponding detailed report:\n\n"
+            f"Previous Outline :\n{last_saved_structure}\n\nPrevious Full Report:\n{last_saved_report}\n\n"
+            f"The outline has been updated to the following, and some changes have been made to the detailed report as well:\n\n"
+            f"Updated Outline:\n{current_structure}\n\nUpdated Full Report (in progress):\n{current_report}\n\n"
+            f"Please rewrite the detailed report to reflect the changes in the updated outline while maintaining the detailed changes made by the user in the updated report. "
+            f"Ensure the new report is coherent, professionally styled, and integrates the updates from the new structure."
+        )
+
+        # Call the OpenAI API
+        chat_completion = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant, skilled at revising and updating reports based on given notes."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=4000  # Adjust the number of tokens based on the expected length of the report
+        )
+
+        # Access the response correctly
+        new_detailed_report = chat_completion.choices[0].message.content.strip()
+
+        # Return the updated detailed report
+        return jsonify({"updatedDetailedReport": new_detailed_report})
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
     
 @app.route('/')
 @cross_origin()
