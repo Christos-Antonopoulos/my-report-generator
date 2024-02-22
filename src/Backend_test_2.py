@@ -1,11 +1,7 @@
-from flask import Flask, render_template, request, jsonify
 import os
 from openai import OpenAI
 from flask import Flask, render_template, request, jsonify, current_app
-
-from flask_cors import CORS
-
-from flask_cors import cross_origin
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 
@@ -108,7 +104,7 @@ def generate_detailed_report_from_structure(structure, student_name, gender, cla
     chat_completion = client.chat.completions.create(
         model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the notes of what to write"},
+            {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the struccture of the report."},
             {"role": "user", "content": prompt}
         ],
         max_tokens= 2000
@@ -121,6 +117,7 @@ def generate_detailed_report_from_structure(structure, student_name, gender, cla
 
 
 #print(structure)
+#change name 
 @app.route('/generate_report', methods=['POST', 'OPTIONS'])
 @cross_origin()
 def generate_report():
@@ -200,7 +197,7 @@ def regenerate_detailed_report():
         chat_completion = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant, skilled at revising and updating reports based on given notes."},
+                {"role": "system", "content": "You are a helpful assistant, skilled at revising and updating reports based on the report structure provided while maintaining user edits"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=4000  # Adjust the number of tokens based on the expected length of the report
