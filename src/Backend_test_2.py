@@ -39,7 +39,7 @@ def generate_student_report_structure(student_name, gender, class_behavior, stre
 
     # Call the OpenAI API
     chat_completion = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4-0125-preview",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
@@ -93,16 +93,13 @@ def generate_detailed_report_from_structure(structure, student_name, gender, cla
     # Reuse the OpenAI client setup
     client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
-    # Format a prompt to expand the given structure into a full report
-    #prompt = f"Expand the following report structure into a detailed performance report with a {tone} tone:\n\n{structure}\n\nDetailed Report:"
-    # Format a prompt to transform the given structure into a flowing, narrative-style report
-    #prompt = f"Based on the following report outline, write a detailed performance report in a continuous, narrative style, maintaining a {tone} tone throughout. The report should seamlessly integrate the points from the outline into full paragraphs without using bullet points.\n\nOutline:\n{structure}\n\nNarrative Report:"
+    
 
-    prompt = f" Given the structure of the report provided, and the following details:\n\nStudent Name: {student_name}\nGender: {gender}\nClass Behavior: {class_behavior}\nStrengths: {strengths}\nYear Group: {year_group}\nSubject: {subject}\nAcademic Performance: {academic_performance}\nAreas of Development: {areas_of_development}\n write a  performance report in a continuous, proffesional style, maintaining a {tone} tone throughout. The report should seamlessly integrate the points from the outline into full paragraphs without using bullet points. Follow the \n\nOutline:\n{structure}\n\n"
+    prompt = f" Given the structure of the report provided, and the following details:\n\nStudent Name: {student_name}\nGender: {gender}\nClass Behavior: {class_behavior}\nStrengths: {strengths}\nYear Group: {year_group}\nSubject: {subject}\nAcademic Performance: {academic_performance}\nAreas of Development: {areas_of_development}\n write a  performance report in a continuous, proffesional style, maintaining a {tone} tone throughout. The report should seamlessly integrate the points from the outline into full paragraphs without using bullet points. The total report length must strictly be  {report_length} words. Follow the \n\nOutline:\n{structure}\n\n"
 
     # Call the OpenAI API
     chat_completion = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4-0125-preview",
         messages=[
             {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the struccture of the report."},
             {"role": "user", "content": prompt}
@@ -137,7 +134,7 @@ def generate_report():
             academic_performance=data.get('academic_performance'),
             areas_of_development=data.get('areas_of_development'),
             tone=data.get('tone'),
-            report_length=int(data.get('report_length', 100))  # Defaulting to 100 if not provided
+            report_length=int(data.get('report_length', 150))  # Defaulting to 100 if not provided
         )
         return jsonify({"report": report})
     
@@ -195,12 +192,12 @@ def regenerate_detailed_report():
 
         # Call the OpenAI API
         chat_completion = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4-0125-preview",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant, skilled at revising and updating reports based on the report structure provided while maintaining user edits"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=4000  # Adjust the number of tokens based on the expected length of the report
+            max_tokens=1000  # Adjust the number of tokens based on the expected length of the report
         )
 
         # Access the response correctly

@@ -22,12 +22,12 @@
 .editors-container {
   display: flex;
   justify-content: space-between;
-  min-width: 1020px;
   flex-direction: row;
+  width:70%;
 }
 
 /* Individual editors */
 .editor {
-  width: 500px; /* Set a fixed width */
+  width: 50%; /* Set a fixed width */
   height: 300px; /* Set a fixed height */
 }
