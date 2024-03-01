@@ -56,7 +56,12 @@ const ReportForm = () => {
           ...formValues,
         }
       );
-      setDetailedReport(detailedResponse.data.detailedReport);
+      const formattedDetailedReport =
+        detailedResponse.data.detailedReport.replace(/\n/g, "<br>");
+
+      setDetailedReport(formattedDetailedReport);
+      //setDetailedReport(detailedResponse.data.detailedReport);
+
       console.log("Ive been executed (detailed report)");
       setLastSavedReport(detailedReport);
     } catch (error) {
@@ -102,9 +107,12 @@ const ReportForm = () => {
         "http://127.0.0.1:5000/generate_report ",
         formValues
       );
-      setStructure(response.data.report);
+      const formattedStructure = response.data.report.replace(/\n/g, "<br>");
+
+      setStructure(formattedStructure);
+      //setStructure(response.data.report);
       console.log("Ive been executed Structure");
-      setLastSavedStructure(structure);
+      setLastSavedStructure(formattedStructure);
     } catch (error) {
       console.error("Error generating the report:", error);
     }
@@ -112,7 +120,7 @@ const ReportForm = () => {
   };
 
   return (
-    <div>
+    <Box>
       <Box
         component="form"
         sx={{
@@ -188,6 +196,14 @@ const ReportForm = () => {
             variant="outlined"
           />
           <TextField
+            label="Class Behavior"
+            type="text"
+            name="class_behavior"
+            value={formValues.class_behavior}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
             label="Tone"
             type="text"
             name="tone"
@@ -236,7 +252,17 @@ const ReportForm = () => {
             style={{ height: "350px" }}
             theme="snow"
             value={detailedReport}
-            onChange={(content) => setDetailedReport(content)}
+            onChange={(content, delta, source, editor) => {
+              const formattedContent = content.replace(/\n/g, "<br>");
+              // Log the content of the editor after change
+              console.log(formattedContent);
+              // If you also want to log the actual changes (deltas)
+              console.log(delta);
+              // Update the state with the new content
+              // setDetailedReport(content);
+              setDetailedReport(formattedContent);
+            }}
+            //onChange={(content) => setDetailedReport(content)}
           />
         </Box>
       </Box>
@@ -248,7 +274,7 @@ const ReportForm = () => {
       >
         Regenerate Full Report
       </Button>
-    </div>
+    </Box>
   );
 };
 

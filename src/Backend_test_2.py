@@ -39,7 +39,7 @@ def generate_student_report_structure(student_name, gender, class_behavior, stre
 
     # Call the OpenAI API
     chat_completion = client.chat.completions.create(
-        model="gpt-4-0125-preview",
+        model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
@@ -99,12 +99,12 @@ def generate_detailed_report_from_structure(structure, student_name, gender, cla
 
     # Call the OpenAI API
     chat_completion = client.chat.completions.create(
-        model="gpt-4-0125-preview",
+        model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the struccture of the report."},
+            {"role": "system", "content": "You are a helpful assistant, that is great at writing reports given the structure of the report."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens= 2000
+        max_tokens= 500
     )
     
     # Access the response correctly
@@ -176,6 +176,8 @@ def regenerate_detailed_report():
         last_saved_report = data.get('last_saved_report')
         current_structure = data.get('current_structure')
         current_report = data.get('current_report')
+        tone = data.get('tone')
+        report_length = data.get('report_length', 200)
 
         # Reuse the OpenAI client setup
         client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
@@ -186,18 +188,24 @@ def regenerate_detailed_report():
             f"Previous Outline :\n{last_saved_structure}\n\nPrevious Full Report:\n{last_saved_report}\n\n"
             f"The outline has been updated to the following, and some changes have been made to the detailed report as well:\n\n"
             f"Updated Outline:\n{current_structure}\n\nUpdated Full Report (in progress):\n{current_report}\n\n"
-            f"Please rewrite the detailed report to reflect the changes in the updated outline while maintaining the detailed changes made by the user in the updated report. "
-            f"Ensure the new report is coherent, professionally styled, and integrates the updates from the new structure."
+            #f"Please rewrite the detailed report to reflect the changes in the updated outline while maintaining the detailed changes made by the user in the updated report. "
+            f"Please putput the (exact) text present in the current detailed report and only make incorporate the small changes present in the updated outline "
+
+            f"Ensure the new report uses exactly the same text present in the current report and structly only  changes the text where needed to integrate the updates from the new structure. The total length of the report must be around  \n{report_length}\n\n words"
         )
 
         # Call the OpenAI API
         chat_completion = client.chat.completions.create(
-            model="gpt-4-0125-preview",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant, skilled at revising and updating reports based on the report structure provided while maintaining user edits"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000  # Adjust the number of tokens based on the expected length of the report
+            max_tokens=  2 * report_length, # Adjust the number of tokens based on the expected length of the report
+            #temperature = 0.1,  # Set to a lower value to make output more deterministic
+            frequency_penalty = 0.5 ,  # Set to encourage less repetition
+            presence_penalty = - 0.4,  # Set to discourage deviation from input content
+            temperature = 0.1
         )
 
         # Access the response correctly
