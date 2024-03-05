@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import quill styles
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Typography, IconButton } from "@mui/material";
+//import { diff_match_patch } from "diff-match-patch";
 
 const ReportForm = () => {
   // Initialize form state with all fields
@@ -39,6 +40,7 @@ const ReportForm = () => {
     setDetailedReport(content); // Update the current report state
   };
 
+  //
   // Update form state based on input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -118,6 +120,10 @@ const ReportForm = () => {
     }
     await handleDetailedReportGeneration();
   };
+
+  //
+
+  //
 
   return (
     <Box>
