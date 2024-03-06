@@ -272,14 +272,18 @@ const ReportForm = () => {
           />
         </Box>
       </Box>
-      <Button
-        variant="contained"
-        type="submit"
-        sx={{ margin: "auto", top: "15px", marginBottom: "15px" }}
-        onClick={handleRegenerateReport}
+      <Box
+        sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
       >
-        Regenerate Full Report
-      </Button>
+        <Button
+          variant="contained"
+          type="submit"
+          sx={{ margin: "auto", top: "15px", marginBottom: "15px" }}
+          onClick={handleRegenerateReport}
+        >
+          Regenerate Full Report
+        </Button>
+      </Box>
     </Box>
   );
 };
