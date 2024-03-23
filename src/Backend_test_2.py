@@ -1,9 +1,10 @@
 import os
 from openai import OpenAI
-from flask import Flask, render_template, request, jsonify, current_app
+from flask import Flask, render_template, request, jsonify, current_app 
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+
 
 
 CORS(app)
@@ -215,6 +216,39 @@ def regenerate_detailed_report():
         return jsonify({"updatedDetailedReport": new_detailed_report})
     else:
         return jsonify({"error": "Request must be JSON"}), 400
+    
+conversation_history = []
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+
+    global conversation_history
+    data = request.json
+    user_input = data.get('input')
+    client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    # Add user's input to the conversation history
+    conversation_history.append(user_input)
+
+    # Make the API call to OpenAI with the conversation history
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": message} for message in conversation_history]
+        )
+
+        # Extract the response message
+        response_message = response['choices'][0]['message']['content']
+
+        # Add the AI's response to the conversation history
+        conversation_history.append(response_message)
+
+        return jsonify({'response': response_message})
+    
+    except Exception as e:
+        # Handle OpenAI errors
+        return jsonify({'error': str(e)}), 503
     
 @app.route('/')
 @cross_origin()
