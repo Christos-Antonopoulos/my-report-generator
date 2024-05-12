@@ -1,6 +1,8 @@
 // In ChatInterface.js
-
+import React from "react";
 import axios from "axios";
+import { collection, doc, addDoc } from "firebase/firestore";
+import { db } from "./App";
 
 import { useState, useRef, useEffect } from "react";
 import {
@@ -13,7 +15,7 @@ import {
   Paper,
 } from "@mui/material";
 
-const ChatInterface = () => {
+const ChatInterface = ({ sessionId }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -33,6 +35,18 @@ const ChatInterface = () => {
         });
         const botResponse = response.data.response;
         if (botResponse) {
+          await addDoc(collection(db, "chatSessions"), {
+            sessionId: sessionId,
+            userInput: input,
+            botResponse: botResponse,
+            timeStamp: new Date(),
+          })
+            .then((docRef) => {
+              console.log("Document written with ID: ", docRef.id);
+            })
+            .catch((error) => {
+              console.error("Error adding document: ", error);
+            });
           setMessages([...newMessages, { text: botResponse, sender: "bot" }]);
         }
       } catch (error) {
@@ -69,16 +83,26 @@ const ChatInterface = () => {
           maxWidth: "600px",
           maxHeight: "80vh",
           overflow: "auto",
+          marginBottom: 5,
         }}
       >
         <List>
           {messages.map((message, index) => (
-            <ListItem key={index}>
-              <ListItemText
-                primary={message.text}
-                sx={{ wordWrap: "break-word" }}
-                align={message.sender === "user" ? "right" : "left"}
-              />
+            <ListItem
+              key={index}
+              sx={{
+                display: "flex",
+                justifyContent:
+                  message.sender === "user" ? "flex-end" : "flex-start",
+              }}
+            >
+              <Box>
+                <ListItemText
+                  primary={message.sender === "user" ? "You" : "AI"}
+                  secondary={<React.Fragment>{message.text}</React.Fragment>}
+                  sx={{ wordWrap: "break-word" }}
+                />
+              </Box>
             </ListItem>
           ))}
           <div ref={messagesEndRef} />
@@ -100,6 +124,8 @@ const ChatInterface = () => {
       >
         <TextField
           fullWidth
+          minRows={2}
+          multiline
           label="Type your message..."
           variant="outlined"
           value={input}

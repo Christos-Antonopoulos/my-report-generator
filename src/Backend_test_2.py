@@ -227,6 +227,7 @@ def chat():
     data = request.json
     user_input = data.get('input')
     client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    print(client)
     
     # Add user's input to the conversation history
     conversation_history.append(user_input)
@@ -237,9 +238,13 @@ def chat():
             model="gpt-4",
             messages=[{"role": "user", "content": message} for message in conversation_history]
         )
+        print(response)
+
 
         # Extract the response message
-        response_message = response['choices'][0]['message']['content']
+        response_message = response.choices[0].message.content
+
+        print(response_message)
 
         # Add the AI's response to the conversation history
         conversation_history.append(response_message)

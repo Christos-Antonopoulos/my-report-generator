@@ -1,7 +1,7 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
-const RichTextEditor = () => {
+const RichTextEditor = ({ report }) => {
   return (
     <div
       style={{
@@ -14,7 +14,7 @@ const RichTextEditor = () => {
       <Editor
         //apiKey={process.env.REACT_APP_TinyMCE_API_KEY} // Replace with your TinyMCE API key
         apiKey="v80gza1cxuxhl9n62pe3h13i3uaaknn95go95fti01901ep0"
-        initialValue="<p>This is the initial content of the editor.</p>"
+        initialValue={report}
         init={{
           height: 500,
           width: 1000,
